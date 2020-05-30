@@ -1,16 +1,18 @@
-#include "Maze.h"
+// Fill out your copyright notice in the Description page of Project Settings.
 
-#include <iostream>
+
+#include "MazeAlgorithm.h"
+
 #include <ctime>
 #include <cstring>
 
 enum class EDirection
 {
-    NORTH,
-    EAST,
-    WEST,
-    SOUTH,
-    ALL
+	NORTH,
+	EAST,
+	WEST,
+	SOUTH,
+	ALL
 };
 
 int get_random();
@@ -19,22 +21,22 @@ Maze::Maze(int vert, int horiz) :
 	vertical_(vert),
 	horizontal_(horiz)
 {
-	cell_ = new Cell*[vert];
-    intermediate_array = new int[horiz];
+	cell_ = new Cell * [vert];
+	intermediate_array = new int[horiz];
 
 	for (int i = 0; i < vert; i++)
 		cell_[i] = new Cell[horiz];
-    
-    Construct();
+
+	Construct();
 }
 
 void Maze::Construct() noexcept
 {
 	for (int j = 0; j < horizontal_; j++)
-    {
+	{
 		cell_[0][j].set_ = j;
-        cell_[0][j].north_ = Cell::WALL;
-    }
+		cell_[0][j].north_ = Cell::WALL;
+	}
 
 	// begin
 
@@ -114,7 +116,7 @@ void Maze::Construct() noexcept
 
 	last_line_processing(cell_[vertical_ - 1], horizontal_);
 
-    placement = convert();
+	placement = convert();
 }
 
 Maze::~Maze()
@@ -123,9 +125,16 @@ Maze::~Maze()
 		delete[] cell_[i];
 
 	delete[] cell_;
-    delete[] intermediate_array;
-    if (placement)
-        delete[] placement;
+	delete[] intermediate_array;
+	if (placement)
+		delete[] placement;
+}
+
+int Maze::operator[](int index) const noexcept
+{
+	if (index < (vertical_ + 1) * (horizontal_ + 1))
+		return placement[index];
+	else return -1;
 }
 
 int get_random()
@@ -138,9 +147,8 @@ int get_random()
 }
 
 int Maze::change_array_before_start(Cell** array, int number, int range)
-{  
+{
 	memset(intermediate_array, 0, horizontal_ * sizeof(int));
-
 
 	for (int i = 0; i < range; i++)
 	{
@@ -168,7 +176,7 @@ int Maze::change_array_before_start(Cell** array, int number, int range)
 			while (intermediate_array[set_number] != 0)
 				set_number++;
 			array[number][i].set_ = set_number;
-            
+
 			intermediate_array[set_number] = 1;
 		}
 
@@ -176,7 +184,7 @@ int Maze::change_array_before_start(Cell** array, int number, int range)
 }
 
 
-int Maze::last_line_processing(Cell * array, int range)
+int Maze::last_line_processing(Cell* array, int range)
 {
 	int prev = array[0].set_;
 
@@ -249,51 +257,12 @@ bool Cell::check_wall(EDirection dir)
 	return false;
 }
 
-int Maze::print_maze()
+int* Maze::convert()
 {
+	int* res = new(std::nothrow) int[(vertical_ + 1) * (horizontal_ + 1)];
+	if (res == nullptr)
+		return res;
 
-	for (int i = 0; i < horizontal_; i++)
-		printf(" __");
-
-	printf("\n");
-
-	for (int i = 0; i < vertical_; i++)
-	{
-		printf("|");
-
-		for (int j = 0; j < horizontal_; j++)
-		{
-			if (cell_[i][j].south_ == Cell::WALL)
-			{
-				if (i < vertical_ - 1)
-					if (cell_[i + 1][j].north_ != Cell::WALL)
-						printf("!!");
-					else
-						printf("__");
-				else
-					printf("__");
-			}
-			else
-				printf("  ");
-
-			if (cell_[i][j].check_wall(EDirection::EAST))
-				printf("|");
-			else
-				printf(" ");
-		}
-
-		printf("\n");
-	}
-
-	return 0;
-}
-
-int * Maze::convert()
-{
-	int * res = new(std::nothrow) int[(vertical_ + 1) * (horizontal_ + 1)];
-    if (res == nullptr)
-        return res;
-    
 	for (int i = 0; i < (vertical_ + 1) * (horizontal_ + 1); i++)
 		res[i] = 0;
 
@@ -308,7 +277,7 @@ int * Maze::convert()
 
 				if (i > 0)
 					if (cell_[i - 1][j].south_ != Cell::WALL)
-						printf("! ");
+						return nullptr;
 				k++;
 				res[(i) * (horizontal_ + 1) + j] += EPosition::RIGHT;
 			}
