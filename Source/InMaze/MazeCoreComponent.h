@@ -27,11 +27,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetSize();
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnArena(int PlayerCount);
+
 	UPROPERTY(EditAnywhere)
 	int SizeOfMaze = 5;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Walls")
+	UPROPERTY(EditDefaultsOnly, Category = "Cells Params")
+	float CellSize = 400;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Arena")
 	TSubclassOf<AActor> WallToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Arena")
+	TSubclassOf<AActor> ArenaToSpawn;
 
 protected:
 	// Called when the game starts

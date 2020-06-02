@@ -53,8 +53,8 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 			FRotator rot{0,0,0};
 			rot.Yaw = 90.f;
 			FVector pos{ FloorPosition };
-			pos.X += (i % (SizeOfMaze + 1)) * 400.f;
-			pos.Y += (i / (SizeOfMaze + 1)) * 400.f - 400.f;
+			pos.X += (i % (SizeOfMaze + 1)) * CellSize;
+			pos.Y += (i / (SizeOfMaze + 1)) * CellSize - CellSize;
 			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			break;
 		}
@@ -62,8 +62,8 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 		{
 			FRotator rot{0,0,0};
 			FVector pos{ FloorPosition };
-			pos.X += (i % (SizeOfMaze + 1)) * 400.f;
-			pos.Y += (i / (SizeOfMaze + 1)) * 400.f;
+			pos.X += (i % (SizeOfMaze + 1)) * CellSize;
+			pos.Y += (i / (SizeOfMaze + 1)) * CellSize;
 			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			break;
 		}
@@ -71,10 +71,10 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 		{
 			FRotator rot{0,0,0};
 			FVector pos{ FloorPosition };
-			pos.X += (i % (SizeOfMaze + 1)) * 400.f;
-			pos.Y += (i / (SizeOfMaze + 1)) * 400.f;
+			pos.X += (i % (SizeOfMaze + 1)) * CellSize;
+			pos.Y += (i / (SizeOfMaze + 1)) * CellSize;
 			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
-			pos.Y -= 400.f;
+			pos.Y -= CellSize;
 			rot.Yaw = 90.f;
 			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			break;
@@ -91,4 +91,27 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 int UMazeCoreComponent::GetSize()
 {
 	return SizeOfMaze;
+}
+
+void UMazeCoreComponent::SpawnArena(int PlayerCount)
+{
+	int OneDimensionSize = static_cast<int>(sqrt(PlayerCount));
+
+	FVector location{ 0.f, 0.f, 0.f };
+
+	for (int i = 0; i != PlayerCount; ++i)
+	{
+		int const row = i / OneDimensionSize;
+		int const col = i % OneDimensionSize;
+
+		float const distant_of_arenas = 500.f;
+		float const delta = CellSize * SizeOfMaze + distant_of_arenas;
+
+		location.X = col * delta;
+		location.Y = row * delta;
+
+		GetWorld()->SpawnActor<AActor>(ArenaToSpawn, location, FRotator{ 0.f, 0.f, 0.f });
+	}
+
+
 }
