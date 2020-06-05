@@ -8,8 +8,8 @@ struct Cell
 {
     enum
     {
-        WALL,
-        NO_WALL,
+        NO_WALL = 0,
+        WALL = 1,
         RANDOM_NUMBER = 56
     };
     int north_, west_, east_, south_;
@@ -21,6 +21,32 @@ struct Cell
     bool check_wall(EDirection dir);
 };
 
+
+struct Cell_Improved
+{
+    // Wall_position[0] -> up, Wall_position[1] -> Left
+    int Wall_position[2] = { 0, 0 };
+
+    // [0] -> up left, [1] -> up right, [2] -> down left, [3] -> down right
+    int CornerDecoration_position[4] = {0, 0, 0, 0 };
+
+    // Up Left corner (=0 -> none); (=1 -> box); (=2 -> fancy_1) (=3 -> fancy_2 - diff rotation) (=4 -> plug)
+    enum class EFaceDecorationType
+    {
+        None = 0,
+        Box,
+        Bend_UpRight,
+        Bend_UpLeft,
+        Bend_DownRight,
+        Bend_DownLeft,
+        Plug_Up,
+        Plug_Down,
+        Plug_Right,
+        Plug_Left
+    };
+    EFaceDecorationType FaceDecoration_position = EFaceDecorationType::None;
+};
+
 struct Maze
 {
 private:
@@ -30,10 +56,10 @@ private:
 
     int change_array_before_start(Cell** array, int number, int range);
     int last_line_processing(Cell* array, int range);
-    int* convert();
+    Cell_Improved** convert();
     void Construct() noexcept;
 
-    int* placement;
+    Cell_Improved ** placement;
 
 public:
     Maze(int vert, int horiz);
@@ -45,5 +71,5 @@ public:
         DOWN = 2,
         BOTH = 3
     };
-    int operator[] (int index) const noexcept;
+    Cell_Improved const & At (int i, int j) const noexcept;
 };

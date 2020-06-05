@@ -38,9 +38,51 @@ void UMazeCoreComponent::SetSize(int Size)
 	//UE_LOG(LogTemp, Warning, TEXT("%d"), Size);
 }
 
-void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor *> & in)
+void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 {
 	TArray<AActor*> array;
+
+	for (int i = 0; i != SizeOfMaze * SizeOfMaze; ++i)
+	{
+		int const col = i % SizeOfMaze;
+		int const row = i / SizeOfMaze;
+
+		FVector const floorPosition{ FloorPosition + FVector{col * CellSize, row * CellSize, 0} };
+		GetWorld()->SpawnActor<AActor>(FloorToSpawn, floorPosition, FRotator{0.f, 0.f, 0.f});
+	}
+
+
+	for (int i = 0; i != SizeOfMaze + 1; ++i)
+	{
+		for (int j = 0; j != SizeOfMaze + 1; ++j)
+		{
+			Cell_Improved const& Current_cell = Maze_path->At(i, j);
+
+			if (Current_cell.Wall_position[0])
+			{
+				FRotator rot{ 0,0,0 };
+				FVector pos{ FloorPosition };
+				pos.X += j * CellSize;
+				pos.Y += i * CellSize;
+				array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
+			}
+			if (Current_cell.Wall_position[1])
+			{
+				FRotator rot{ 0,0,0 };
+				rot.Yaw = 90.f;
+				FVector pos{ FloorPosition };
+				pos.X += j * CellSize;
+				pos.Y += i * CellSize;// -CellSize;
+				array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
+			}
+		}
+	}
+
+
+
+	/*
+
+
 
 	for (int i = 0; i != (SizeOfMaze + 1) * (SizeOfMaze + 1); ++i)
 	{
@@ -48,7 +90,7 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 		{
 		case Maze::EPosition::NOTHING:
 			break;
-		case Maze::EPosition::DOWN:
+		case Maze::EPosition::DOWN: // Left real
 		{
 			FRotator rot{0,0,0};
 			rot.Yaw = 90.f;
@@ -58,7 +100,7 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			break;
 		}
-		case Maze::EPosition::RIGHT:
+		case Maze::EPosition::RIGHT: // Down real
 		{
 			FRotator rot{0,0,0};
 			FVector pos{ FloorPosition };
@@ -85,7 +127,7 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition, TArray<AActor
 			break;
 		}
 	}
-
+	*/
 }
 
 int UMazeCoreComponent::GetSize()

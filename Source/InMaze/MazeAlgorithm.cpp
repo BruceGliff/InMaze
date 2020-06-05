@@ -127,14 +127,16 @@ Maze::~Maze()
 	delete[] cell_;
 	delete[] intermediate_array;
 	if (placement)
+	{
+		for (int i = 0; i != vertical_ + 1; ++i)
+			delete[] placement[i];
 		delete[] placement;
+	}
 }
 
-int Maze::operator[](int index) const noexcept
+Cell_Improved const & Maze::At(int i, int j) const noexcept
 {
-	if (index < (vertical_ + 1) * (horizontal_ + 1))
-		return placement[index];
-	else return -1;
+	return placement[i][j];
 }
 
 int get_random()
@@ -257,40 +259,107 @@ bool Cell::check_wall(EDirection dir)
 	return false;
 }
 
-int* Maze::convert()
+Cell_Improved ** Maze::convert()
 {
-	int* res = new(std::nothrow) int[(vertical_ + 1) * (horizontal_ + 1)];
-	if (res == nullptr)
-		return res;
-
-	for (int i = 0; i < (vertical_ + 1) * (horizontal_ + 1); i++)
-		res[i] = 0;
-
-	int k = 0;
-
-	for (int i = 0; i < vertical_; i++)
+	Cell_Improved** cells = new(std::nothrow) Cell_Improved * [vertical_ + 1];
+	if (!cells)
+		return nullptr;
+	for (int i = 0; i != vertical_ + 1; ++i)
 	{
-		for (int j = 0; j < horizontal_; j++)
+		cells[i] = new(std::nothrow) Cell_Improved [horizontal_ + 1];
+		if (!cells[i])
 		{
-			if (cell_[i][j].north_ == Cell::WALL)
-			{
-
-				if (i > 0)
-					if (cell_[i - 1][j].south_ != Cell::WALL)
-						return nullptr;
-				k++;
-				res[(i) * (horizontal_ + 1) + j] += EPosition::RIGHT;
-			}
-
-			if (cell_[i][j].west_ == Cell::WALL)
-				res[(i + 1) * (horizontal_ + 1) + j] += EPosition::DOWN;
+			for (int j = 0; j != i; ++j)
+				delete[] cells[j];
+			delete[] cells;
 		}
-
-		res[(i + 1) * (horizontal_ + 1) + horizontal_] += EPosition::DOWN;
 	}
 
-	for (int j = 0; j < horizontal_; j++)
-		res[(vertical_) * (horizontal_ + 1) + j] += EPosition::RIGHT;
+	for (int i = 0; i != vertical_; ++i)
+	{
+		for (int j = 0; j != horizontal_; ++j)
+		{
+			Cell const& Current_cell = cell_[i][j];
 
-	return res;
+			// Set up Walls
+			if (Current_cell.north_)
+				cells[i][j].Wall_position[0] = 1;
+			if (Current_cell.west_)
+				cells[i][j].Wall_position[1] = 1;
+
+			// Set up corner decoration
+			cells[i][j].CornerDecoration_position[0] = Current_cell.north_ & Current_cell.west_;
+			cells[i][j].CornerDecoration_position[1] = Current_cell.north_ & Current_cell.east_;
+			cells[i][j].CornerDecoration_position[2] = Current_cell.south_ & Current_cell.west_;
+			cells[i][j].CornerDecoration_position[3] = Current_cell.south_ & Current_cell.east_;
+
+			// Set up face decoration
+			if (Current_cell.north_)
+			{
+				if ( (j != 0) && (cell_[i][j - 1].north_) )
+				{
+					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+					continue;
+				}
+				if ( (i != 0) && (cell_[i - 1][j].west_) && (i != vertical_ - 1) && (cell_[i + 1][j].west_) )
+				{
+					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+					continue;
+				}
+				if ( (i != vertical_ - 1) && (cell_[i + 1][j].west_) )
+				{
+					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Bend_DownRight;
+					continue;
+				}
+				if ( (i != 0) && (cell_[i - 1][j].west_) )
+				{
+					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Bend_UpRight;
+					continue;
+				}
+				cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Plug_Left;
+				continue;
+			}
+			if (Current_cell.west_)
+			{
+				if ((i != 0) && (cell_[i - 1][j].west_))
+				{
+					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+					continue;
+				}
+				if ((j != 0) && (cell_[i][j - 1].north_))
+				{
+					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Bend_DownLeft;
+					continue;
+				}
+				cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Plug_Up;
+				continue;
+			}
+
+			if ((j != 0) && (i != 0) && (cell_[i - 1][j].west_) && (cell_[i][j - 1].north_))
+			{
+				cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Bend_UpLeft;
+				continue;
+			}
+			if ((j != 0) && (cell_[i][j - 1].north_))
+			{
+				cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Plug_Right;
+				continue;
+			}
+			if ((i != 0) && (cell_[i - 1][j].west_))
+			{
+				cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Plug_Down;
+				continue;
+			}
+		}
+		cells[i][horizontal_].Wall_position[1] = 1;
+		cells[i][horizontal_].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+	}
+
+	for (int j = 0; j != horizontal_; ++j)
+	{
+		cells[vertical_][j].Wall_position[0] = 1;
+		cells[vertical_][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+	}
+
+	return cells;
 }

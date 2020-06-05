@@ -249,9 +249,9 @@ bool Cell::check_wall(EDirection dir)
 	return false;
 }
 
+
 int Maze::print_maze()
 {
-
 	for (int i = 0; i < horizontal_; i++)
 		printf(" __");
 
@@ -284,6 +284,8 @@ int Maze::print_maze()
 
 		printf("\n");
 	}
+
+	printf("\n");
 
 	return 0;
 }
