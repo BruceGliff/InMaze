@@ -39,9 +39,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Arena")
 	TSubclassOf<AActor> WallToSpawn;
 	UPROPERTY(EditAnywhere, Category = "Arena")
-	TSubclassOf<AActor> ArenaToSpawn;
-	UPROPERTY(EditAnywhere, Category = "Arena")
 	TSubclassOf<AActor> FloorToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Arena")
+	TSubclassOf<AActor> CornerDecorationToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Arena")
+	TSubclassOf<AActor> BlendToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Arena")
+	TSubclassOf<AActor> BoxToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Arena")
+	TSubclassOf<AActor> PlugToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Arena")
+	TSubclassOf<AActor> ArenaToSpawn;
+	
 
 protected:
 	// Called when the game starts

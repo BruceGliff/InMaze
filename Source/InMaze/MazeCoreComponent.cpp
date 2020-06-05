@@ -48,7 +48,7 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 		int const row = i / SizeOfMaze;
 
 		FVector const floorPosition{ FloorPosition + FVector{col * CellSize, row * CellSize, 0} };
-		GetWorld()->SpawnActor<AActor>(FloorToSpawn, floorPosition, FRotator{0.f, 0.f, 0.f});
+		AActor * Spawned = GetWorld()->SpawnActor<AActor>(FloorToSpawn, floorPosition, FRotator{0.f, 0.f, 0.f});
 	}
 
 
@@ -58,22 +58,35 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 		{
 			Cell_Improved const& Current_cell = Maze_path->At(i, j);
 
+			FVector const pos{ FloorPosition + FVector{j * CellSize, i * CellSize, 0} };
+
 			if (Current_cell.Wall_position[0])
 			{
-				FRotator rot{ 0,0,0 };
-				FVector pos{ FloorPosition };
-				pos.X += j * CellSize;
-				pos.Y += i * CellSize;
+				FRotator rot{ 0.f, 0.f, 0.f };
 				array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			}
 			if (Current_cell.Wall_position[1])
 			{
-				FRotator rot{ 0,0,0 };
+				FRotator rot{ 0.f, 0.f, 0.f };
 				rot.Yaw = 90.f;
-				FVector pos{ FloorPosition };
-				pos.X += j * CellSize;
-				pos.Y += i * CellSize;// -CellSize;
 				array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
+			}
+
+			for (int k = 0; k != 4; ++k)
+			{
+				if (Current_cell.CornerDecoration_position[k])
+				{
+					FRotator rot{ 0.f, 0.f, 0.f };
+					rot.Yaw = 90.f * (k % 2) - 90.f * (k / 2);
+					if (k == 3)
+						rot.Yaw = 180.f;
+					array.Add(GetWorld()->SpawnActor<AActor>(CornerDecorationToSpawn, pos + FVector{ CellSize * (k % 2), CellSize * (k / 2), 0.f}, rot));
+				}
+			}
+
+			switch (Current_cell.FaceDecoration_position)
+			{
+
 			}
 		}
 	}
