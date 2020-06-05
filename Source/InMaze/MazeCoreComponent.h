@@ -43,7 +43,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Arena")
 	TSubclassOf<AActor> CornerDecorationToSpawn;
 	UPROPERTY(EditAnywhere, Category = "Arena")
-	TSubclassOf<AActor> BlendToSpawn;
+	TSubclassOf<AActor> BendToSpawn;
 	UPROPERTY(EditAnywhere, Category = "Arena")
 	TSubclassOf<AActor> BoxToSpawn;
 	UPROPERTY(EditAnywhere, Category = "Arena")

@@ -86,7 +86,60 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 
 			switch (Current_cell.FaceDecoration_position)
 			{
-
+			case Cell_Improved::EFaceDecorationType::Bend_DownLeft:
+			{
+				FRotator const rot{ 0.f, 90.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Bend_DownRight:
+			{
+				FRotator const rot{ 0.f, 0.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Bend_UpLeft:
+			{
+				FRotator const rot{ 0.f, 180.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Bend_UpRight:
+			{
+				FRotator const rot{ 0.f, 270.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Box:
+			{
+				FRotator const rot{ 0.f, 0.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(BoxToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Plug_Down:
+			{
+				FRotator const rot{ 0.f, 270.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Plug_Left:
+			{
+				FRotator const rot{ 0.f, 0.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Plug_Right:
+			{
+				FRotator const rot{ 0.f, 180.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				break;
+			}
+			case Cell_Improved::EFaceDecorationType::Plug_Up:
+			{
+				FRotator const rot{ 0.f, 90.f, 0.f };
+				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				break;
+			}
 			}
 		}
 	}
