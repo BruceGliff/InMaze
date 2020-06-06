@@ -296,17 +296,20 @@ Cell_Improved ** Maze::convert()
 			// Set up face decoration
 			if (Current_cell.north_)
 			{
+				if ((j != 0) && (i != 0) && (cell_[i][j - 1].north_) && (cell_[i - 1][j].west_) && (Current_cell.west_))
+					continue;
+
 				if ( (j != 0) && (cell_[i][j - 1].north_) )
 				{
 					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
 					continue;
 				}
-				if ( (i != 0) && (cell_[i - 1][j].west_) && (i != vertical_ - 1) && (cell_[i + 1][j].west_) )
+				if ( (i != 0) && (cell_[i - 1][j].west_) && (cell_[i][j].west_) )
 				{
 					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
 					continue;
 				}
-				if ( (i != vertical_ - 1) && (cell_[i + 1][j].west_) )
+				if (cell_[i][j].west_)
 				{
 					cells[i][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Bend_DownRight;
 					continue;
@@ -352,13 +355,17 @@ Cell_Improved ** Maze::convert()
 			}
 		}
 		cells[i][horizontal_].Wall_position[1] = 1;
-		cells[i][horizontal_].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+		if (!cell_[i][horizontal_-1].north_)
+			cells[i][horizontal_].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
 	}
 
 	for (int j = 0; j != horizontal_; ++j)
 	{
 		cells[vertical_][j].Wall_position[0] = 1;
-		cells[vertical_][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+		if (!cell_[vertical_ - 1][j].west_)
+			cells[vertical_][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::Box;
+		if (cell_[0][j].west_)
+			cells[0][j].FaceDecoration_position = Cell_Improved::EFaceDecorationType::None;
 	}
 
 	return cells;
