@@ -6,7 +6,6 @@
 #include "Components/SceneComponent.h"
 #include "MazeCoreComponent.generated.h"
 
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class INMAZE_API UMazeCoreComponent : public USceneComponent
 {

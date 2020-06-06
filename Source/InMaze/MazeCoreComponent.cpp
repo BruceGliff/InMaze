@@ -4,6 +4,8 @@
 #include "MazeCoreComponent.h"
 #include "MazeAlgorithm.h"
 
+#include "ConstructObjects/Construction_Floor.h"
+
 // Sets default values for this component's properties
 UMazeCoreComponent::UMazeCoreComponent()
 {
@@ -11,7 +13,6 @@ UMazeCoreComponent::UMazeCoreComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
 }
 
 UMazeCoreComponent::~UMazeCoreComponent()
@@ -41,6 +42,12 @@ void UMazeCoreComponent::SetSize(int Size)
 void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 {
 	TArray<AActor*> array;
+
+	AConstruction_Floor MyFloor;
+
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
 
 	for (int i = 0; i != SizeOfMaze * SizeOfMaze; ++i)
 	{
