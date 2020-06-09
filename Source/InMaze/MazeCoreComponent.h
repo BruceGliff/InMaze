@@ -18,9 +18,6 @@ public:
 	~UMazeCoreComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void SetSize(int Size);
-
-	UFUNCTION(BlueprintCallable)
 	void SpawnWalls(FVector const & FloorPosition);
 
 	UFUNCTION(BlueprintCallable)

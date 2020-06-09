@@ -4,8 +4,6 @@
 #include "MazeCoreComponent.h"
 #include "MazeAlgorithm.h"
 
-#include "ConstructObjects/Construction_Floor.h"
-
 // Sets default values for this component's properties
 UMazeCoreComponent::UMazeCoreComponent()
 {
@@ -33,17 +31,9 @@ void UMazeCoreComponent::BeginPlay()
 	
 }
 
-void UMazeCoreComponent::SetSize(int Size)
-{
-	//Maze_path = new Maze{ Size, Size };
-	//UE_LOG(LogTemp, Warning, TEXT("%d"), Size);
-}
-
 void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 {
 	TArray<AActor*> array;
-
-	AConstruction_Floor MyFloor;
 
 	UWorld* World = GetWorld();
 	if (!World)
@@ -150,57 +140,6 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 			}
 		}
 	}
-
-
-
-	/*
-
-
-
-	for (int i = 0; i != (SizeOfMaze + 1) * (SizeOfMaze + 1); ++i)
-	{
-		switch ((*Maze_path)[i])
-		{
-		case Maze::EPosition::NOTHING:
-			break;
-		case Maze::EPosition::DOWN: // Left real
-		{
-			FRotator rot{0,0,0};
-			rot.Yaw = 90.f;
-			FVector pos{ FloorPosition };
-			pos.X += (i % (SizeOfMaze + 1)) * CellSize;
-			pos.Y += (i / (SizeOfMaze + 1)) * CellSize - CellSize;
-			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
-			break;
-		}
-		case Maze::EPosition::RIGHT: // Down real
-		{
-			FRotator rot{0,0,0};
-			FVector pos{ FloorPosition };
-			pos.X += (i % (SizeOfMaze + 1)) * CellSize;
-			pos.Y += (i / (SizeOfMaze + 1)) * CellSize;
-			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
-			break;
-		}
-		case Maze::EPosition::BOTH:
-		{
-			FRotator rot{0,0,0};
-			FVector pos{ FloorPosition };
-			pos.X += (i % (SizeOfMaze + 1)) * CellSize;
-			pos.Y += (i / (SizeOfMaze + 1)) * CellSize;
-			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
-			pos.Y -= CellSize;
-			rot.Yaw = 90.f;
-			array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
-			break;
-		}
-		default:
-			UE_LOG(LogTemp, Error, TEXT("ERROR index= %d"), i);
-			return;
-			break;
-		}
-	}
-	*/
 }
 
 int UMazeCoreComponent::GetSize()
