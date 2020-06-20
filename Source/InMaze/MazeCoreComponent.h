@@ -46,10 +46,15 @@ public:
 	TSubclassOf<AActor> PlugToSpawn;
 	UPROPERTY(EditAnywhere, Category = "Arena")
 	TSubclassOf<AActor> ArenaToSpawn;
+	UPROPERTY(EditAnywhere, Category = "Characters")
+	TSubclassOf<AActor> CharactersToSpawn;
 	
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	
+
+private:
+	int NumberOfPlayers = 1;
 };

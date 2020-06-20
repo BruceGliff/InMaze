@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "MazeCoreComponent.h"
+
+#include <vector>
 #include "MazeAlgorithm.h"
+#include "GameFramework/PlayerStart.h"
 
 // Sets default values for this component's properties
 UMazeCoreComponent::UMazeCoreComponent()
@@ -34,10 +35,27 @@ void UMazeCoreComponent::BeginPlay()
 void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 {
 	TArray<AActor*> array;
+	array.Reserve((SizeOfMaze + 1) * (SizeOfMaze + 1) * 5);
 
 	UWorld* World = GetWorld();
 	if (!World)
 		return;
+
+	int const Size_pow2 = SizeOfMaze * SizeOfMaze;
+
+	std::vector<int> SpawnShape{ Size_pow2 };
+	SpawnShape.assign(Size_pow2, 0);
+
+	int CurrentSpawnsCount = 0;
+	while (CurrentSpawnsCount != NumberOfPlayers)
+	{
+		int rand = FMath::RandRange(0, Size_pow2);
+		if (!SpawnShape[rand])
+		{
+			SpawnShape[rand] = 1;
+			++CurrentSpawnsCount;
+		}
+	}
 
 	for (int i = 0; i != SizeOfMaze * SizeOfMaze; ++i)
 	{
@@ -45,7 +63,13 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 		int const row = i / SizeOfMaze;
 
 		FVector const floorPosition{ FloorPosition + FVector{col * CellSize, row * CellSize, 0} };
-		AActor * Spawned = GetWorld()->SpawnActor<AActor>(FloorToSpawn, floorPosition, FRotator{0.f, 0.f, 0.f});
+		AActor * Spawned = World->SpawnActor<AActor>(FloorToSpawn, floorPosition, FRotator{0.f, 0.f, 0.f});
+		if (SpawnShape[i])
+		{
+			FVector const SpawnPosition{ floorPosition + FVector{CellSize / 2, CellSize / 2, 0.f} };
+			//AActor* SpawnPoint = World->SpawnActor<APlayerStart>(SpawnPosition, FRotator{ 0.f, 0.f, 0.f });
+			AActor* SpawnPoint = World->SpawnActor<AActor>(CharactersToSpawn, SpawnPosition, FRotator{ 0.f, 0.f, 0.f });
+		}
 	}
 
 
@@ -60,13 +84,13 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 			if (Current_cell.Wall_position[0])
 			{
 				FRotator rot{ 0.f, 0.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			}
 			if (Current_cell.Wall_position[1])
 			{
 				FRotator rot{ 0.f, 0.f, 0.f };
 				rot.Yaw = 90.f;
-				array.Add(GetWorld()->SpawnActor<AActor>(WallToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(WallToSpawn, pos, rot));
 			}
 
 			for (int k = 0; k != 4; ++k)
@@ -77,7 +101,7 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 					rot.Yaw = 90.f * (k % 2) - 90.f * (k / 2);
 					if (k == 3)
 						rot.Yaw = 180.f;
-					array.Add(GetWorld()->SpawnActor<AActor>(CornerDecorationToSpawn, pos + FVector{ CellSize * (k % 2), CellSize * (k / 2), 0.f}, rot));
+					array.Add(World->SpawnActor<AActor>(CornerDecorationToSpawn, pos + FVector{ CellSize * (k % 2), CellSize * (k / 2), 0.f}, rot));
 				}
 			}
 
@@ -86,60 +110,61 @@ void UMazeCoreComponent::SpawnWalls(FVector const & FloorPosition)
 			case Cell_Improved::EFaceDecorationType::Bend_DownLeft:
 			{
 				FRotator const rot{ 0.f, 90.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(BendToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Bend_DownRight:
 			{
 				FRotator const rot{ 0.f, 0.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(BendToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Bend_UpLeft:
 			{
 				FRotator const rot{ 0.f, 180.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(BendToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Bend_UpRight:
 			{
 				FRotator const rot{ 0.f, 270.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(BendToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(BendToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Box:
 			{
 				FRotator const rot{ 0.f, 0.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(BoxToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(BoxToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Plug_Down:
 			{
 				FRotator const rot{ 0.f, 270.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(PlugToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Plug_Left:
 			{
 				FRotator const rot{ 0.f, 0.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(PlugToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Plug_Right:
 			{
 				FRotator const rot{ 0.f, 180.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(PlugToSpawn, pos, rot));
 				break;
 			}
 			case Cell_Improved::EFaceDecorationType::Plug_Up:
 			{
 				FRotator const rot{ 0.f, 90.f, 0.f };
-				array.Add(GetWorld()->SpawnActor<AActor>(PlugToSpawn, pos, rot));
+				array.Add(World->SpawnActor<AActor>(PlugToSpawn, pos, rot));
 				break;
 			}
 			}
 		}
 	}
+
 }
 
 int UMazeCoreComponent::GetSize()
@@ -149,11 +174,16 @@ int UMazeCoreComponent::GetSize()
 
 void UMazeCoreComponent::SpawnArena(int PlayerCount)
 {
+	UWorld* World = GetWorld();
+	if (!World)
+		return;
+
+	NumberOfPlayers = PlayerCount;
 	int OneDimensionSize = static_cast<int>(sqrt(PlayerCount));
 
 	FVector location{ 0.f, 0.f, 0.f };
 
-	for (int i = 0; i != PlayerCount; ++i)
+	for (int i = 0; i != 1; ++i)
 	{
 		int const row = i / OneDimensionSize;
 		int const col = i % OneDimensionSize;
@@ -164,7 +194,7 @@ void UMazeCoreComponent::SpawnArena(int PlayerCount)
 		location.X = col * delta;
 		location.Y = row * delta;
 
-		GetWorld()->SpawnActor<AActor>(ArenaToSpawn, location, FRotator{ 0.f, 0.f, 0.f });
+		World->SpawnActor<AActor>(ArenaToSpawn, location, FRotator{ 0.f, 0.f, 0.f });
 	}
 
 
